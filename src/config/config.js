@@ -1,0 +1,1 @@
+exports.FrontendUrl = 'http://localhost:5173'
