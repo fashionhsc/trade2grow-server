@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
+const config = require('../config/config');
+const logger = require('../logger');
 
-const uri = process.env.MONGO_URI;
 
 const Connection = async () => {
     try {
-        await mongoose.connect(uri);
-        console.log('DB Connected successfully');
+        await mongoose.connect(config.dbUri);
+        logger.info('DB Connected successfully');
     } catch (error) {
-        console.log(`Error occured while connecting with DB : `, error.message);
+        logger.error(`Error occured while connecting with DB : `, error.message);
+        process.exit(1); // Exit process on DB connection failure
     }
 }
 
