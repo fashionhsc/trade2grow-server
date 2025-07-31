@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser')
 const errorMiddleware = require('./middlewares/errorMiddleware');
 const userRoutes = require('./routes/user');
 const logger = require('./logger');
@@ -10,6 +11,7 @@ const config = require('./config/config');
 const app = express();
 
 app.use(helmet());
+app.use(cookieParser());
 app.use(cors({
   origin: config.FrontendUrl,
   methods: ['POST', 'GET', 'PUT', 'DELETE'],
