@@ -14,3 +14,13 @@ exports.authMiddleware = async (req, res, next) => {
         return res.status(401).json({ success: false, message: "Authentication failed" });
     }
 };
+
+// Role-based middleware (e.g., admin only)
+exports.roleMiddleware = (requiredRole) => {
+    return (req, res, next) => {
+        if (!req.user || req.user.role !== requiredRole) {
+            return res.status(403).json({ success: false, message: `Only ${requiredRole}s can access this` });
+        }
+        next();
+    };
+};

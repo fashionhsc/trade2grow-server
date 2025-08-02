@@ -1,16 +1,19 @@
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser')
+const app = express();
+
+
 const errorMiddleware = require('./middlewares/errorMiddleware');
-const userRoutes = require('./routes/user');
 const logger = require('./logger');
 const authRoutes = require('./routes/auth');
 const config = require('./config/config');
-const app = express();
+const userRoutes = require('./routes/user/user');
+const userStageRoutes = require('./routes/user/stage');
+const adminStageRoutes = require('./routes/admin/stage');
+const adminVedioRoutes = require('./routes/admin/vedio');
 
-app.use(helmet());
 app.use(cookieParser());
 app.use(cors({
   origin: config.FrontendUrl,
@@ -27,8 +30,11 @@ app.use(morgan('combined', {
 }));
 
 
-app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/user/stage', userStageRoutes);
+app.use('/api/v1/admin/stage', adminStageRoutes);
+app.use('/api/v1/admin/vedio', adminVedioRoutes);
 
 
 app.use(errorMiddleware)
