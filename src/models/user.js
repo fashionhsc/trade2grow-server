@@ -9,8 +9,8 @@ const userSchema = new mongoose.Schema({
     phoneNumber: String,
     countryCode: String,
     password: String,
-    role: { type: String, enum: ['user', 'admin'], default: 'user' }, 
-    category: { type: String, enum: ['Trader', 'Investor', 'Hedger'] }, // Chosen once during onboarding
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, // Chosen once during onboarding
     coins: { type: Number, default: 0 }, // Updated after missions, trades, purchases, unlocks
     xp: { type: Number, default: 0 }, // Grows with usage and success
     currentStage: { type: Number, default: 0, ref: 'Stage' }, // Increased when user unlocks new stage

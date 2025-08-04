@@ -8,8 +8,8 @@ const stageSchema = new mongoose.Schema({
     description: String, // Shown in UI
     requiredCoins: Number, // Coins needed to unlock
     difficultyLevel: String, // Difficulty tag
-    category: String, // Matches user's category
-    videos: { type: mongoose.Schema.Types.ObjectId, ref: 'StageVideo' },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, // Matches user's category
+    videos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StageVideo' }],
     rewards: {
         coins: Number, // Awarded upon unlock
         xp: Number,    // XP gain

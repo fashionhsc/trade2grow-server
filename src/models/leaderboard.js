@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const leaderboardSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     username: String,
-    category: String,
+    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
     coins: Number,
     xp: Number,
     currentStage: Number,

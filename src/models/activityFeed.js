@@ -10,8 +10,8 @@ const activityFeedSchema = new mongoose.Schema({
         required: true
     },
     category: {
-        type: String,
-        enum: ['Trader', 'Investor', 'Hedger'],
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
         required: true
     },
     message: {

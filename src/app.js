@@ -13,6 +13,7 @@ const userRoutes = require('./routes/user/user');
 const userStageRoutes = require('./routes/user/stage');
 const adminStageRoutes = require('./routes/admin/stage');
 const adminVedioRoutes = require('./routes/admin/vedio');
+const adminCategoryRoutes = require('./routes/admin/category');
 
 app.use(cookieParser());
 app.use(cors({
@@ -35,9 +36,9 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/user/stage', userStageRoutes);
 app.use('/api/v1/admin/stage', adminStageRoutes);
 app.use('/api/v1/admin/vedio', adminVedioRoutes);
+app.use('/api/v1/admin/category', adminCategoryRoutes);
 
 
 app.use(errorMiddleware)
 
 module.exports = app;
-

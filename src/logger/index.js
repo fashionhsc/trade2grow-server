@@ -5,6 +5,7 @@ const logger = createLogger({
     level: 'info',
     format: format.combine(
         format.timestamp({ format: 'YYYY-MM-DD hh:mm:ss A' }),
+        format.errors({ stack: true }), // includes stack trace on error
         format.printf(({ timestamp, level, message }) => {
             return `${timestamp} [${level.toUpperCase()}]: ${message}`;
         })

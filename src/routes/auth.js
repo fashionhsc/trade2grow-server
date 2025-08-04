@@ -1,10 +1,11 @@
 const express = require('express');
 const { firebaseLoginPhone, logout, firebaseLoginGoogle, firebaseRegisterPhone, firebaseRegisterGoogle, manualLogin, manualSignup } = require('../controllers/auth');
 const { authMiddleware } = require('../middlewares/auth');
+const { isEmailExist } = require('../utils/isEmaiExist');
 const authRoutes = express.Router();
 
 
-authRoutes.get('/greet', greetings);
+authRoutes.get('/checkEmail', isEmailExist);
 
 authRoutes.post('/firebaseLoginPhone', firebaseLoginPhone)
 authRoutes.post('/firebaseRegisterPhone', firebaseRegisterPhone)

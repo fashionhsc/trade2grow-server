@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 // Shown per user path & stage. Added manually or by admin.
 const strategySchema = new mongoose.Schema({
     title: String,
-    category: String, // Matches user category
+    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, // Matches user category
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Admin or user
     description: String, // Strategy summary
     difficulty: String, // Easy, Medium, Hard

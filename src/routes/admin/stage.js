@@ -6,9 +6,10 @@ const adminStageRoutes = express.Router();
 adminStageRoutes.use(authMiddleware, roleMiddleware('admin'))
 
 adminStageRoutes.post('/create', createStage);
-adminStageRoutes.get('/:id?', getStages);
-adminStageRoutes.put('/:id', updateStage);
-adminStageRoutes.delete('/:id', updateStage);
+adminStageRoutes.get('/get/:id', getStages);
+adminStageRoutes.get('/get', getStages);
+adminStageRoutes.put('/update/:id', updateStage);
+adminStageRoutes.delete('/delete/:id', updateStage);
 
 
 module.exports = adminStageRoutes;

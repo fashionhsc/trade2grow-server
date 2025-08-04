@@ -82,7 +82,7 @@ exports.firebaseLoginGoogle = tryCatch(async (req, res, next) => {
 })
 
 
-exports.manualSignup = tryCatch(async (req, res) => {
+exports.manualSignup = tryCatch(async (req, res, next) => {
     const { email, password, username, category } = req.body;
     if (!email || !password || !username || !category) return next(new ErrorClass('All fields required', 400));
 
@@ -94,7 +94,7 @@ exports.manualSignup = tryCatch(async (req, res) => {
     res.status(201).cookie('token', token, COOKIE_OPTIONS).json({ success: true, user, message: 'Signup successful' });
 });
 
-exports.manualLogin = tryCatch(async (req, res) => {
+exports.manualLogin = tryCatch(async (req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) return next(new ErrorClass('All fields required', 400));
 
