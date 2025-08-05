@@ -4,7 +4,7 @@ const splitPhoneNumber = (fullPhoneNumber) => {
 
     return {
         countryCode: match[1],     // e.g. "+91"
-        phoneNumber: match[2],     // e.g. "8800784843"
+        phone: match[2],     // e.g. "8800784843"
     };
 }
 

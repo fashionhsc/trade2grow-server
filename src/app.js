@@ -14,6 +14,7 @@ const userStageRoutes = require('./routes/user/stage');
 const adminStageRoutes = require('./routes/admin/stage');
 const adminVedioRoutes = require('./routes/admin/vedio');
 const adminCategoryRoutes = require('./routes/admin/category');
+const userCategory = require('./routes/user/category');
 
 app.use(cookieParser());
 app.use(cors({
@@ -33,6 +34,7 @@ app.use(morgan('combined', {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/category/list', userCategory);
 app.use('/api/v1/user/stage', userStageRoutes);
 app.use('/api/v1/admin/stage', adminStageRoutes);
 app.use('/api/v1/admin/vedio', adminVedioRoutes);

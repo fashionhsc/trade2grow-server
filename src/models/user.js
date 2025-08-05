@@ -4,10 +4,12 @@ const mongoose = require('mongoose');
 // Updated whenever user registers, unlocks a stage, earns coins/xp/badges, or toggles virtual trading
 const userSchema = new mongoose.Schema({
     uid: String, // Firebase UID, never changes
-    username: String, // Set at registration, editable later
+    firstName: String, // Set at registration, editable later
+    lastName: String, // Set at registration, editable later
     email: String, // Firebase email
-    phoneNumber: String,
+    phone: String,
     countryCode: String,
+    gender: { type: String, enum: ['male', 'female'] },
     password: String,
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, // Chosen once during onboarding

@@ -5,7 +5,7 @@ const { isEmailExist } = require('../utils/isEmaiExist');
 const authRoutes = express.Router();
 
 
-authRoutes.get('/checkEmail', isEmailExist);
+authRoutes.post('/checkEmail', isEmailExist);
 
 authRoutes.post('/firebaseLoginPhone', firebaseLoginPhone)
 authRoutes.post('/firebaseRegisterPhone', firebaseRegisterPhone)

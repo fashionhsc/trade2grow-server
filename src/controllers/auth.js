@@ -39,10 +39,10 @@ const addToLeaderBoard = async (user) => {
 
 // --- FIREBASE Register (Phone) ---
 exports.firebaseRegisterPhone = tryCatch(async (req, res, next) => {
-    let { uid, phoneNumber: fullPhone, username, email, category } = req.body;
-    if (!uid || !fullPhone || !username || !email || !category) return next(new ErrorClass('All fields are required', 400));
-    let { countryCode, phoneNumber } = splitPhoneNumber(fullPhone);
-    user = await userModal.create({ uid, phoneNumber, countryCode, username, email, category });
+    let { uid, phone: fullPhone, firstName, lastName, email, category } = req.body;
+    if (!uid || !fullPhone || !firstName || !lastName || !email || !category) return next(new ErrorClass('All fields are required', 400));
+    let { countryCode, phone } = splitPhoneNumber(fullPhone);
+    user = await userModal.create({ uid, phone, countryCode, firstName, email, category });
     await addToLeaderBoard(user);
     const token = await generateToken(user);
     res.status(201).cookie('token', token, COOKIE_OPTIONS).json({ success: true, user, message: 'Logged in successfully' });
