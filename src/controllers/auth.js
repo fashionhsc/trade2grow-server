@@ -6,6 +6,9 @@ const bcrypt = require('bcrypt');
 const logger = require("../logger");
 const userModal = require("../models/user");
 const leaderBoardModal = require("../models/leaderboard");
+const { sendOtpEmail } = require("../services/mailerService");
+const otpModal = require("../models/otp");
+const generateOtp = require("../utils/generateOtp");
 
 const COOKIE_OPTIONS = {
     httpOnly: true,
@@ -39,10 +42,20 @@ const addToLeaderBoard = async (user) => {
 
 // --- FIREBASE Register (Phone) ---
 exports.firebaseRegisterPhone = tryCatch(async (req, res, next) => {
-    let { uid, phone: fullPhone, firstName, lastName, email, category } = req.body;
-    if (!uid || !fullPhone || !firstName || !lastName || !email || !category) return next(new ErrorClass('All fields are required', 400));
+    let { phone: fullPhone, firstName, lastName, email, category } = req.body;
+    if (!fullPhone || !firstName || !lastName || !email || !category) return next(new ErrorClass('All fields are required', 400));
     let { countryCode, phone } = splitPhoneNumber(fullPhone);
-    user = await userModal.create({ uid, phone, countryCode, firstName, email, category });
+    const user = new userModal({
+        uid: req.body.uid || '',
+        phone,
+        countryCode,
+        firstName,
+        lastName,
+        email,
+        category,
+    });
+    await user.save();
+    await user.populate('category');
     await addToLeaderBoard(user);
     const token = await generateToken(user);
     res.status(201).cookie('token', token, COOKIE_OPTIONS).json({ success: true, user, message: 'Logged in successfully' });
@@ -50,9 +63,15 @@ exports.firebaseRegisterPhone = tryCatch(async (req, res, next) => {
 
 // --- FIREBASE LOGIN (Phone) ---
 exports.firebaseLoginPhone = tryCatch(async (req, res, next) => {
-    let { uid } = req.body;
+    let { uid, phoneNumber } = req.body;
     if (!uid) return next(new ErrorClass('All fields are required', 400));
-    let user = await userModal.findOne({ uid });
+    let user;
+    if (phoneNumber) {
+        let { countryCode, phone } = splitPhoneNumber(phoneNumber);
+        user = await userModal.findOne({ phone }).populate('category');
+    } else {
+        user = await userModal.findOne({ uid }).populate('category');
+    }
     if (!user) {
         return next(new ErrorClass('user not found', 404));
     }
@@ -73,7 +92,7 @@ exports.firebaseRegisterGoogle = tryCatch(async (req, res, next) => {
 // --- FIREBASE LOGIN (Google) ---
 exports.firebaseLoginGoogle = tryCatch(async (req, res, next) => {
     let { uid } = req.body;
-    let user = await userModal.findOne({ uid });
+    let user = await userModal.findOne({ uid }).populate('category');
     if (!user) {
         return next(new ErrorClass('user not found', 404));
     }
@@ -83,11 +102,11 @@ exports.firebaseLoginGoogle = tryCatch(async (req, res, next) => {
 
 
 exports.manualSignup = tryCatch(async (req, res, next) => {
-    const { email, password, username, category } = req.body;
-    if (!email || !password || !username || !category) return next(new ErrorClass('All fields required', 400));
+    const { email, password, firstName, lastName, category } = req.body;
+    if (!email || !password || !firstName || !lastName || !category) return next(new ErrorClass('All fields required', 400));
 
     const hashed = await bcrypt.hash(password, 12);
-    const user = await userModal.create({ email, username, password: hashed, category });
+    const user = await userModal.create({ email, firstName, lastName, password: hashed, category });
     await addToLeaderBoard(user);
 
     const token = await generateToken(user);
@@ -98,7 +117,7 @@ exports.manualLogin = tryCatch(async (req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) return next(new ErrorClass('All fields required', 400));
 
-    const user = await userModal.findOne({ email });
+    const user = await userModal.findOne({ email }).populate('category');
     if (!user) return next(new ErrorClass('User not found', 404));
 
     const match = await bcrypt.compare(password, user.password);
@@ -106,6 +125,41 @@ exports.manualLogin = tryCatch(async (req, res, next) => {
 
     const token = await generateToken(user);
     res.status(200).cookie('token', token, COOKIE_OPTIONS).json({ success: true, user, message: 'Logged in successfully' });
+});
+
+
+exports.sendOtp = tryCatch(async (req, res) => {
+    const { email } = req.body;
+
+    const otp = generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+    if (!email || !otp || !expiresAt) return next(new ErrorClass('Error occured while sending OTP', 400));
+    await otpModal.deleteMany({ email }); // cleanup previous OTPs
+    await otpModal.create({ email, otp, expiresAt });
+
+    await sendOtpEmail(email, otp);
+
+    res.status(200).json({ success: true, message: 'OTP sent to email' });
+
+});
+
+exports.verifyOtp = tryCatch(async (req, res, next) => {
+    const { email, fullOtp } = req.body;
+    if (!email || !fullOtp) return next(new ErrorClass('All fields are required', 400));
+
+    const record = await otpModal.findOne({ email, otp: fullOtp });
+    if (!record) return next(new ErrorClass('Invalid OTP', 400))
+
+    if (record.expiresAt < new Date()) {
+        await otpModal.deleteOne({ _id: record._id });
+        return next(new ErrorClass('OTP expired', 400));
+    }
+
+    await otpModal.deleteOne({ _id: record._id });
+    const user = await userModal.findOne({ email }).populate('category');
+    if (!user) return res.json({ success: false, message: 'user not found' });
+    const token = await generateToken(user);
+    res.status(200).cookie('token', token, COOKIE_OPTIONS).json({ success: true, user, message: 'OTP verified' });
 });
 
 

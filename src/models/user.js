@@ -6,8 +6,8 @@ const userSchema = new mongoose.Schema({
     uid: String, // Firebase UID, never changes
     firstName: String, // Set at registration, editable later
     lastName: String, // Set at registration, editable later
-    email: String, // Firebase email
-    phone: String,
+    email: { type: String, unique: true, required: true }, // Firebase email
+    phone: { type: String, unique: true, required: true },
     countryCode: String,
     gender: { type: String, enum: ['male', 'female'] },
     password: String,
