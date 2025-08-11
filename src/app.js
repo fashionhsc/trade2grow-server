@@ -17,6 +17,8 @@ const adminCategoryRoutes = require('./routes/admin/category');
 const userCategory = require('./routes/user/category');
 const leaderboardRoutes = require('./routes/user/leaderboard');
 const userPaymentRoutes = require('./routes/user/payment');
+const adminStrategyRoutes = require('./routes/admin/strategy');
+const userStrategyRoutes = require('./routes/user/strategy');
 
 app.use(cookieParser());
 app.use(cors({
@@ -41,13 +43,18 @@ app.use('/api/v1/auth', authRoutes);
 
 
 // login required
+// user routes
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/user/stage', userStageRoutes);
 app.use('/api/v1/user/leaderboard', leaderboardRoutes);
+app.use('/api/v1/user/payment', userPaymentRoutes);
+app.use('/api/v1/user/strategy', userStrategyRoutes);
+
+// admin routes
 app.use('/api/v1/admin/stage', adminStageRoutes);
 app.use('/api/v1/admin/vedio', adminVedioRoutes);
 app.use('/api/v1/admin/category', adminCategoryRoutes);
-app.use('/api/v1/user/payment', userPaymentRoutes);
+app.use('/api/v1/admin/strategy', adminStrategyRoutes);
 
 
 app.use(errorMiddleware)
