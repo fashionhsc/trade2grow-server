@@ -1,8 +1,7 @@
 const express = require('express');
 const { firebaseLoginPhone, logout, firebaseLoginGoogle, firebaseRegisterPhone, firebaseRegisterGoogle, manualLogin, manualSignup, sendOtp, verifyOtp } = require('../controllers/auth');
 const { authMiddleware } = require('../middlewares/auth');
-const { isEmailExist } = require('../utils/isEmaiExist');
-const { isPhoneExist } = require('../utils/isPhoneExist');
+const { isEmailExist, isPhoneExist } = require('../utils/common');
 const authRoutes = express.Router();
 
 

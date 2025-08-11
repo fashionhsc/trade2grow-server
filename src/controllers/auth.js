@@ -1,5 +1,4 @@
 const ErrorClass = require("../utils/errorClass");
-const splitPhoneNumber = require("../utils/splitNumber");
 const tryCatch = require("../utils/tryCatch");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -8,7 +7,7 @@ const userModal = require("../models/user");
 const leaderBoardModal = require("../models/leaderboard");
 const { sendOtpEmail } = require("../services/mailerService");
 const otpModal = require("../models/otp");
-const generateOtp = require("../utils/generateOtp");
+const { generateOtp, splitPhoneNumber } = require("../utils/common");
 
 const COOKIE_OPTIONS = {
     httpOnly: true,
@@ -58,7 +57,7 @@ exports.firebaseRegisterPhone = tryCatch(async (req, res, next) => {
     await user.populate('category');
     await addToLeaderBoard(user);
     const token = await generateToken(user);
-    res.status(201).cookie('token', token, COOKIE_OPTIONS).json({ success: true, user, message: 'Logged in successfully' });
+    res.status(201).cookie('token', token, COOKIE_OPTIONS).json({ success: true, user, message: 'Signed in successfully' });
 })
 
 // --- FIREBASE LOGIN (Phone) ---
