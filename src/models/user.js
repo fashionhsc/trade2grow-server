@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, // Chosen once during onboarding
     coins: { type: Number, default: 0 }, // Updated after missions, trades, purchases, unlocks
     xp: { type: Number, default: 0 }, // Grows with usage and success
-    currentStage: { type: Number, default: 0, ref: 'Stage' }, // Increased when user unlocks new stage
+    currentStage: { type: mongoose.Schema.ObjectId, ref: 'Stage' }, // Increased when user unlocks new stage
     badges: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Badge' }], // Modified when badge is earned
     unlockedStrategies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Strategy' }], // Updated after strategy unlock
     joinedAt: { type: Date, default: Date.now },

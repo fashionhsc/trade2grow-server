@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 // Payments: for onboarding or in-app purchases
 // Inserted upon order creation and updated on payment success/failure via webhook or response
 const paymentSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+    stageId: { type: mongoose.Schema.Types.ObjectId, ref: 'Stage' },
     amount: Number, // ₹500 or more
     currency: { type: String, default: 'INR' },
     status: { type: String, enum: ['pending', 'success', 'failed'], default: 'pending' },

@@ -2,7 +2,6 @@ const ActivityFeedModal = require("../../models/badge");
 const leaderBoardModal = require("../../models/leaderboard");
 const paymentModal = require("../../models/payment");
 const stageModal = require("../../models/stage");
-const StageVideoModal = require("../../models/stageVideo");
 const userModal = require("../../models/user");
 const UserProgressModal = require("../../models/userProgress");
 const ErrorClass = require("../../utils/errorClass");
@@ -10,72 +9,51 @@ const tryCatch = require("../../utils/tryCatch");
 
 
 exports.unlockStage = tryCatch(async (req, res, next) => {
-    const { stageId } = req.params;
-    if (!stageId) return next(new ErrorClass('StageId is required', 400));
 
-    const { uid, amount } = req.body;
-    if (!uid || !amount) return next(new ErrorClass('uid or amount is invalid', 400));
+    const { _id } = req.body;
+    if (!_id) return next(new ErrorClass('_id is invalid', 400));
 
-    const user = await userModal.findOne({ uid });
-    const stage = await stageModal.findById(stageId);
-    if (!user || !stage) return next(new ErrorClass('User or stage not found', 404));
+    const user = await userModal.findById(_id).populate('currentStage');
+    if (!user) return next(new ErrorClass('User not found', 404));
 
-    const currentStage = stage._id - 1;
+    let nextStage;
 
-    // Check video completion
-    const stageVideos = await StageVideoModal.find({ stageId: currentStage });
-    const userProgress = await UserProgressModal.findOne({ userId: user._id, stageId: currentStage });
-
-    const hasWatchedAll = stageVideos.every(video =>
-        userProgress?.watchedVideos?.some(watched => watched.toString() === video._id.toString())
-    );
-
-    if (!hasWatchedAll) {
-        return res.status(400).send('Please watch all videos to unlock next stage.');
+    if (!user.currentStage) {
+        // Onboarding case → Unlock Stage 1
+        nextStage = await stageModal.findOne({ stageId: 1, category: user.category });
+    } else {
+        // Unlock the stage after the current one
+        nextStage = await stageModal.findOne({
+            stageId: user.currentStage.stageId + 1,
+            category: user.category
+        });
     }
 
+    if (!nextStage) return next(new ErrorClass('No next stage found. Possibly last stage reached.', 404));
 
-    const checkPayment = await paymentModal.findOne({ userId: user._id, status: 'success', amount });
-    if (!checkPayment || user.coins < stage.requiredCoins) return next(new ErrorClass('Not enough coins or no payment found', 403));
+    // Reward user
+    user.coins += nextStage.rewards.coins || 0;
+    user.xp += nextStage.rewards.xp || 0;
+    user.currentStage = nextStage.id;
 
-    user.currentStage = Math.max(user.currentStage, stage._id);
+    // Set paid status (if payment unlocks paid tier)
+    user.isPaidUser = true;
+
     await user.save();
 
     await leaderBoardModal.updateOne(
-        { userId: user._id },
+        { userId: _id },
         {
             $set: {
                 username: user.username,
                 category: user.category,
                 coins: user.coins,
                 xp: user.xp,
-                currentStage: user.currentStage,
                 lastUpdated: new Date()
             }
         },
         { upsert: true }
     );
-
-    await UserProgressModal.updateOne(
-        {
-            userId: user._id,
-            stageId: stage._id
-        },
-        {
-            $setOnInsert: {
-                startedAt: new Date(),
-                status: 'in-progress'
-            }
-        },
-        { upsert: true, new: true }
-    )
-
-    await ActivityFeedModal.create({
-        userId: user._id,
-        username: user.username,
-        category: user.category,
-        message: `${user.username} unlocked Stage ${stage._id}!`
-    });
 
     res.send({ success: true, message: 'Stage unlocked', user });
 })

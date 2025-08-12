@@ -6,7 +6,7 @@ const tryCatch = require("../../utils/tryCatch");
 const userModal = require('../../models/user');
 
 exports.createOrder = tryCatch(async (req, res, next) => {
-    let { userId, planType, amount } = req.body;
+    let { userId, planType, amount, currentStage } = req.body;
     if (!userId || !planType || !amount) return next(new ErrorClass('Missing params', 400));
 
     // Price in paise (INR) 
@@ -23,6 +23,7 @@ exports.createOrder = tryCatch(async (req, res, next) => {
     // Save payment record in MongoDB so that webhook can access it
     const payment = await paymentModal.create({
         userId,
+        stageId: currentStage,
         amount,
         currency: 'INR',
         status: 'pending',

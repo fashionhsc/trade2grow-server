@@ -4,14 +4,11 @@ const tryCatch = require("../../utils/tryCatch");
 
 // CREATE a new stage
 exports.createStage = tryCatch(async (req, res, next) => {
-    const { _id, name, description, requiredCoins, difficultyLevel, category, rewards, videos } = req.body;
-    if (!_id || name || !description || !requiredCoins || !difficultyLevel || !category || !rewards || !videos) return next(new ErrorClass('All fields are required to create new stage', 400));
-
-    const exists = await stageModal.findById(_id);
-    if (exists) return next(new ErrorClass('Stage ID already exists', 404));
+    const { stageId, name, description, requiredCoins, difficultyLevel, category, rewards, videos } = req.body;
+    if (!stageId || !name || !description || !difficultyLevel || !category || !rewards || !videos) return next(new ErrorClass('All fields are required to create new stage', 400));
 
     const newStage = await stageModal.create({
-        _id,
+        stageId,
         name,
         description,
         requiredCoins,
@@ -28,8 +25,8 @@ exports.createStage = tryCatch(async (req, res, next) => {
 exports.getStages = tryCatch(async (req, res) => {
     const { id } = req.params;
     const stages = id
-        ? await stageModal.findById(id).populate('videos')
-        : await stageModal.find().sort({ _id: 1 }).populate('videos');
+        ? await stageModal.findById(id).populate('videos').populate('category')
+        : await stageModal.find().sort({ _id: 1 }).populate('videos').populate('category');
 
     if (!stages) return next(new ErrorClass('Stage(s) not found', 404))
     res.json({ success: true, data: stages });

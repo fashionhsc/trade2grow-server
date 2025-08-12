@@ -8,7 +8,6 @@ const leaderboardSchema = new mongoose.Schema({
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
     coins: Number,
     xp: Number,
-    currentStage: Number,
     lastUpdated: { type: Date, default: Date.now } // Used to sort leaderboard freshness
 });
 

@@ -7,7 +7,7 @@ const userProgressSchema = new mongoose.Schema({
     stageId: { type: Number, required: true, ref: 'Stage' }, // Which stage this belongs to
     strategyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Strategy' },
     status: String, // started / completed / failed
-    watchedVideos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'StageVideo' }],
+    watchedVideos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }],
     startedAt: Date,
     completedAt: Date,
     coinsEarned: Number,
