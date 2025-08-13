@@ -41,7 +41,7 @@ const addToLeaderBoard = async (user) => {
 
 // --- FIREBASE Register (Phone) ---
 exports.firebaseRegisterPhone = tryCatch(async (req, res, next) => {
-    let { phone: fullPhone, firstName, lastName, email, category } = req.body;
+    let { phone: fullPhone, firstName, lastName, email, category, gender } = req.body;
     if (!fullPhone || !firstName || !lastName || !email || !category) return next(new ErrorClass('All fields are required', 400));
     let { countryCode, phone } = splitPhoneNumber(fullPhone);
     const user = new userModal({
@@ -52,6 +52,7 @@ exports.firebaseRegisterPhone = tryCatch(async (req, res, next) => {
         lastName,
         email,
         category,
+        gender
     });
     await user.save();
     await user.populate('category');
@@ -67,9 +68,21 @@ exports.firebaseLoginPhone = tryCatch(async (req, res, next) => {
     let user;
     if (phoneNumber) {
         let { countryCode, phone } = splitPhoneNumber(phoneNumber);
-        user = await userModal.findOne({ phone }).populate('category').populate('currentStage');
+        user = await userModal.findOne({ phone }).populate('category').populate({
+            path: 'currentStage',
+            populate: {
+                path: 'videos',
+                model: 'Video'
+            },
+        });
     } else {
-        user = await userModal.findOne({ uid }).populate('category').populate('currentStage');
+        user = await userModal.findOne({ uid }).populate('category').populate({
+            path: 'currentStage',
+            populate: {
+                path: 'videos',
+                model: 'Video'
+            },
+        });
     }
     if (!user) {
         return next(new ErrorClass('user not found', 404));
@@ -80,10 +93,10 @@ exports.firebaseLoginPhone = tryCatch(async (req, res, next) => {
 
 // --- FIREBASE Register (Google) ---
 exports.firebaseRegisterGoogle = tryCatch(async (req, res, next) => {
-    let { uid, email, displayName, category, phoneNumber: fullPhone } = req.body;
+    let { uid, email, displayName, category, phoneNumber: fullPhone, gender } = req.body;
     if (!uid || !displayName || !email || !category) return next(new ErrorClass('All fields are required', 400));
     if (fullPhone) ({ countryCode, phoneNumber } = splitPhoneNumber(fullPhone))
-    user = await userModal.create({ uid, phoneNumber, countryCode, username: displayName, email, category });
+    user = await userModal.create({ uid, phoneNumber, countryCode, username: displayName, email, category, gender });
     await addToLeaderBoard(user);
     const token = await generateToken(user);
     res.status(201).cookie('token', token, COOKIE_OPTIONS).json({ success: true, user, message: 'Logged in successfully' });
@@ -101,11 +114,11 @@ exports.firebaseLoginGoogle = tryCatch(async (req, res, next) => {
 
 
 exports.manualSignup = tryCatch(async (req, res, next) => {
-    const { email, password, firstName, lastName, category } = req.body;
+    const { email, password, firstName, lastName, category, gender } = req.body;
     if (!email || !password || !firstName || !lastName || !category) return next(new ErrorClass('All fields required', 400));
 
     const hashed = await bcrypt.hash(password, 12);
-    const user = await userModal.create({ email, firstName, lastName, password: hashed, category });
+    const user = await userModal.create({ email, firstName, lastName, password: hashed, category, gender });
     await addToLeaderBoard(user);
 
     const token = await generateToken(user);
