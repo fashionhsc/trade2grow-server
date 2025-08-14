@@ -13,6 +13,7 @@ const videoSchema = new mongoose.Schema({
     duration: Number,                // Full video duration in seconds
     thumbnail: String,                // Optional thumbnail or poster
     category: { type: mongoose.Schema.ObjectId, ref: 'Category', required: true },
+    public_id: { type: String }
 });
 
 
