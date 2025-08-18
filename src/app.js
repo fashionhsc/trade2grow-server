@@ -20,6 +20,8 @@ const userPaymentRoutes = require('./routes/user/payment');
 const adminStrategyRoutes = require('./routes/admin/strategy');
 const userStrategyRoutes = require('./routes/user/strategy');
 const uploadRoutes = require('./routes/admin/upload');
+const notificationRoutes = require('./routes/notificationRoutes');
+// const notificationRoutes = require('./routes/notificationRoutes');
 
 app.use(cookieParser());
 app.use(cors({
@@ -57,8 +59,11 @@ app.use('/api/v1/admin/vedio', adminVedioRoutes);
 app.use('/api/v1/admin/upload', uploadRoutes);
 app.use('/api/v1/admin/category', adminCategoryRoutes);
 app.use('/api/v1/admin/strategy', adminStrategyRoutes);
+app.use('/api/v1/notify', notificationRoutes);
 
 
 app.use(errorMiddleware)
+
+
 
 module.exports = app;

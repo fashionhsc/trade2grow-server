@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
     unlockedStrategies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Strategy' }], // Updated after strategy unlock
     joinedAt: { type: Date, default: Date.now },
     isPaidUser: { type: Boolean, default: false }, // Set true after successful payment
+    pushToken: { type: String },
 });
 
 const userModal = mongoose.model('User', userSchema);
