@@ -10,7 +10,7 @@ exports.createCategory = tryCatch(async (req, res, next) => {
     const exists = await categoryModal.findOne({ name });
     if (exists) return next(new ErrorClass('Category already exists', 409));
 
-    const newCategory = await categoryModal.create({ name, description });
+    const newCategory = await categoryModal.create({ name, description, image: req.file ? req.file.path : null });
     res.status(201).json({ success: true, category: newCategory });
 });
 
@@ -31,7 +31,11 @@ exports.getCategoryById = tryCatch(async (req, res, next) => {
 // Update Category
 exports.updateCategory = async (req, res, next) => {
     try {
-        const { ...updateData } = req.body;
+        let { ...updateData } = req.body;
+
+        if (req.file) {
+            updateData.image = req.file.path;
+        }
 
         const updated = await categoryModal.findByIdAndUpdate(
             req.params.id,

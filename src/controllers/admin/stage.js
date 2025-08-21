@@ -24,9 +24,10 @@ exports.createStage = tryCatch(async (req, res, next) => {
 // READ all stages or one stage by ID
 exports.getStages = tryCatch(async (req, res) => {
     const { id } = req.params;
+    const { category } = req.body;
     const stages = id
-        ? await stageModal.findById(id).populate('videos').populate('category')
-        : await stageModal.find().sort({ _id: 1 }).populate('videos').populate('category');
+        ? await stageModal.find({ _id: id, category }).populate('videos').populate('category')
+        : await stageModal.find({category}).sort({ _id: 1 }).populate('videos').populate('category');
 
     if (!stages) return next(new ErrorClass('Stage(s) not found', 404))
     res.json({ success: true, data: stages });

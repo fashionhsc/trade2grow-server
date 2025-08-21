@@ -14,7 +14,8 @@ const categorySchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    image:String
 });
 
 const categoryModal = mongoose.model('Category', categorySchema);
